@@ -2,7 +2,7 @@ const electron = require(`electron`);
 const url = require(`url`);
 const path = require(`path`);
 
-const {app, BrowserWindow, Menu} = electron;
+const {app, BrowserWindow, Menu, ipcMain} = electron;
 
 let mainWindow;
 let addWindow;
@@ -17,6 +17,10 @@ app.on(`ready`, ()=>{
     protocol: `file:`,
     slashes: true
   }));
+  //quit app on main window close
+  mainWindow.on('close', ()=> {
+    app.quit();
+  });
   //build the application menu
   const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
   //set the application menu
@@ -24,7 +28,6 @@ app.on(`ready`, ()=>{
 });
 
 // handle createAddWindow
-
 function createAddWindow() {
   addWindow = new BrowserWindow({
     width: 300,
@@ -37,9 +40,21 @@ function createAddWindow() {
     protocol: `file:`,
     slashes: true
   }));
+  //garbage collection handle for closing app with addWindow open
+  addWindow.on(`close`, ()=>{
+    addWindow = null;
+  });
 }
 
-//create menu template
+//catch item added
+ipcMain.on(`item:add`, (e, item)=>{
+  mainWindow.webContents.send(`item:add`, item);
+  console.log(item);
+  addWindow.close();
+
+});
+
+//create menu template [NOTE darwin is system key for mac user]
 const mainMenuTemplate = [{
       label: `File`,
       submenu: [{
@@ -58,3 +73,24 @@ const mainMenuTemplate = [{
       }
     ]
 }];
+
+//if mac, add menu spacer
+if(process.platform == 'darwin') {
+  mainMenuTemplate.unshift({});
+}
+
+//add dev tools menu for non production use
+if(process.env.NODE_ENV !== `production`) {
+  mainMenuTemplate.push({
+    label: `Developer Tools`,
+    submenu: [{
+      label: `Toggle DevTools`,
+      accelerator: process.platform == `darwin` ? `Command+I` : `Ctrl+I`,
+      click(item, focusedWindow) {
+        focusedWindow.toggleDevTools();
+      }
+    }, {
+      role: `reload`
+    }]
+  });
+}
