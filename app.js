@@ -1,15 +1,18 @@
 const electron = require(`electron`);
 const url = require(`url`);
 const path = require(`path`);
+const startup = require('./startup');
 
 const {app, BrowserWindow, Menu, ipcMain} = electron;
 
 let mainWindow;
 let addWindow;
 
+process.env.NODE_ENV = startup.enviornment;
 // listen for app to be ready (app start)
 app.on(`ready`, ()=>{
-  console.log(`starting app....`);
+  console.log(`environment: ${process.env.NODE_ENV}`);
+  console.log(`db1 Connection String ${startup.db1ConnectionString}`)
   mainWindow = new BrowserWindow({});
   //load mainWindow view
   mainWindow.loadURL(url.format({
@@ -19,6 +22,7 @@ app.on(`ready`, ()=>{
   }));
   //quit app on main window close
   mainWindow.on('close', ()=> {
+    console.log(`the server is shutting down...`);
     app.quit();
   });
   //build the application menu
