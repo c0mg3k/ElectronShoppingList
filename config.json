@@ -1,0 +1,14 @@
+{
+  "environment": "development",
+  "releaseVersion":"a01",
+  "connections": {
+    "db1":{
+      "DB1ConString": "DB1ConnectionString Output",
+      "DB1User": "DB1UserName"
+    },
+    "db2":{
+      "DB2ConString": "DB2ConnectionString Output",
+      "DB2User": "DB2UserName"
+    }
+  }
+}
