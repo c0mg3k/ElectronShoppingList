@@ -22,8 +22,8 @@ app.on(`ready`, ()=>{
   }));
   //quit app on main window close
   mainWindow.on('close', ()=> {
-    console.log(`the server is shutting down...`);
     app.quit();
+    console.log(`the server is shutting down...`);
   });
   //build the application menu
   const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
